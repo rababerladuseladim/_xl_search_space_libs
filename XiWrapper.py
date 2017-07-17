@@ -134,12 +134,12 @@ class XiWrapper:
             exit_code = process.poll()
             if output == '' and exit_code is not None:
                 break
-            elif "java.lang.OutOfMemoryError" in output:
-                process.kill()
-                raise XiSearchOutOfMemoryException(returncode=1, cmd=xi_cmd, out_file=output_file, output=output)
-            if output:
+            elif output:
                 # print output.strip()
                 logging.debug("XiSearch: " + output.strip())
+                if "java.lang.OutOfMemoryError" in output:
+                    process.kill()
+                    raise XiSearchOutOfMemoryException(returncode=1, cmd=xi_cmd, out_file=output_file, output=output)
         if exit_code != 0:  # if process exit code is non zero
             raise XiSearchException(exit_code, xi_cmd, output_file, 'XiSearch exited with error message!')
         logging.debug("Search execution took {} for cmd: {}"

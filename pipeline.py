@@ -204,7 +204,7 @@ class XiFdrWrapper:
         # TODO check whether @classmethod can do this
         xifdr_cmd = XiFdrWrapper.build_xifdr_arguments(xifdr_input_csv, xifdr_output_dir, pepfdr, memory, reportfactor,
                                                        additional_xifdr_arguments)
-        logger.debug("xifdr arguments: {}".format(" ".join(map(str, xifdr_cmd))))
+        logger.info("xiFDR arguments: {}".format(" ".join(map(str, xifdr_cmd))))
         # # # # #
         process = subprocess.Popen(xifdr_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         # real time output of Xi messages
@@ -215,10 +215,10 @@ class XiFdrWrapper:
                 break
             if output:
                 # print output.strip()
-                logging.debug("XiFdr: " + output.strip())
+                logger.debug("xiFDR: " + output.strip())
         if exit_code != 0:  # if process exit code is non zero
             raise subprocess.CalledProcessError(exit_code, xifdr_cmd)
-        logging.debug("Search execution took {} for cmd: {}"
+        logger.info("xiFDR execution took {} for cmd: {}"
                       .format(calculate_elapsed_time(starttime), xifdr_cmd))
         # # # # #
         for rel_dir, sub_dirs, files in os.walk(xifdr_output_dir):
@@ -287,8 +287,8 @@ def execute_pipeline(
         reportfactor=reportfactor,
         additional_xifdr_arguments=additional_xifdr_arguments
     )
-    logger.info("xifdr execution for '{}' took {}"
-                .format(list_of_dirs[1], calculate_elapsed_time(starttime)))
+    # logger.info("xifdr execution for '{}' took {}"
+    #             .format(list_of_dirs[1], calculate_elapsed_time(starttime)))
     return xi_result, xifdr_results
 
 

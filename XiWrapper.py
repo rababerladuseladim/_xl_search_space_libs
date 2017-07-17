@@ -126,7 +126,7 @@ class XiWrapper:
 
         # call xi
         starttime = time.time()
-        logging.debug("xisearch cmd: {}".format(" ".join(map(str, xi_cmd))))
+        logging.info("XiSearch cmd: {}".format(" ".join(map(str, xi_cmd))))
         process = subprocess.Popen(xi_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         # real time output of Xi messages
         while True:
@@ -142,6 +142,6 @@ class XiWrapper:
                     raise XiSearchOutOfMemoryException(returncode=1, cmd=xi_cmd, out_file=output_file, output=output)
         if exit_code != 0:  # if process exit code is non zero
             raise XiSearchException(exit_code, xi_cmd, output_file, 'XiSearch exited with error message!')
-        logging.debug("Search execution took {} for cmd: {}"
-                      .format(XiWrapper.calculate_elapsed_time(starttime), xi_cmd))
+        logging.info("XiSearch execution took {} for cmd: {}"
+                     .format(XiWrapper.calculate_elapsed_time(starttime), xi_cmd))
         return output_file

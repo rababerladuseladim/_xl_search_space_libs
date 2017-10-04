@@ -17,6 +17,10 @@ class XiSearchException(subprocess.CalledProcessError):
         self.out_file = out_file
         pass
 
+    def __str__(self):
+        return "XiSearch command '{}' produced an error: '{}'"\
+            .format(" ".join(self.cmd), self.output)
+
 
 class XiSearchOutOfMemoryException(XiSearchException):
     def __init__(self, returncode, cmd, out_file, output):
@@ -44,6 +48,10 @@ class XiWrapper:
 
     @staticmethod
     def build_xi_arguments(xi_path, xi_config, peak_files, fasta_files, memory, output, additional_parameters=()):
+        """
+        Example command (fastutil-version for mem-optimization has to match jave version):
+        java -cp XiSearch.jar:fastutil-8.1.0.jar rappsilber.applications.Xi --config=[path to config] --xiconf=TOPMATCHESONLY:true --peaks=[path to peaklist1] --peaks=[path to peaklist2] --peaks=[path to peaklist3] --fasta=[path to fasta file1] --fasta=[path to fasta file2] --fasta=[path to fasta file3] --output=[path to result file]
+        """
         cmd = ["java"]
 
         # memory
@@ -53,7 +61,17 @@ class XiWrapper:
                         ])
 
         # XiSearch jar
-        cmd.extend(["-cp", xi_path, "rappsilber.applications.Xi"])
+        cmd.extend([
+            "-cp"
+            , xi_path
+            # Win:
+            # + ";fastutil-7.2.1.jar"    # uncomment for java 7 mem optimization
+            # + ";fastutil-8.1.0.jar"    # uncomment for java 8 mem optimization
+            # linux:
+            + ":fastutil-7.2.1.jar"    # uncomment for java 7 mem optimization
+            # + ":fastutil-8.1.0.jar"    # uncomment for java 8 mem optimization
+            , "rappsilber.applications.Xi"
+        ])
 
         # config
         cmd.append("--config=" + xi_config)

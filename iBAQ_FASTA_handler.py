@@ -142,16 +142,16 @@ class IbaqExtraction:
 
 
 class FastaHandler:
-    def __init__(self, fasta_filename):
+    def __init__(self, fasta_filename, re_id_pattern=r'^>.*\|(.*)\|.*'):
         self.filename = fasta_filename
-        self.dict = self.read_fasta()
+        self.dict = self.read_fasta(re_id_pattern)
 
-    def read_fasta(self):
-        """read self.filename fasta file into a dict with protein id as key and its sequencce as value"""
+    def read_fasta(self, re_id_pattern):
+        """read self.filename fasta file into a dict with protein id as key and its sequence as value"""
         mydict = {}
         dict_key = ""
         list_of_non_unique_ids = []
-        protein_id_regex = re.compile(r'^>.*\|(.*)\|.*')
+        protein_id_regex = re.compile(re_id_pattern)
         protein_seq_regex = re.compile(r'^[A-Za-z]\B')
         with open(self.filename) as db:
             for line in db.readlines():
@@ -178,7 +178,9 @@ class FastaHandler:
     def build_fasta(self, protein_id_list, filename, max_number=None):
         bool_unfound_protein = False
         no_found_protein = 0
-        filename_not_found = os.path.join(os.path.split(filename)[0], "not_found_in_reference.fasta")
+        path, filename_only = os.path.split(filename)
+        filename_wo_ext, ext = os.path.splitext(filename_only)
+        filename_not_found = os.path.join(path, filename_wo_ext + "_not_found_in_reference" + ext)
         with open(filename_not_found, 'w+') as f_not_found:
             f_not_found.write(r"# all the proteins not found in the reference fasta are listed here."+'\n')
             with open(filename, 'w+') as f:

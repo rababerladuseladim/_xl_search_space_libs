@@ -39,7 +39,7 @@ class IbaqExtraction:
         # add column with logarithmic iBAQ values, natural logarithm
         sorted_results['logIBAQ'] = np.log(sorted_results['iBAQ'])
         # add columns with normalized iBAQ values
-        sorted_results['normIBAQ'] = sorted_results['iBAQ'] / sorted_results['iBAQ'].max()
+        sorted_results['normIBAQ'] = sorted_results['iBAQ'] / float(sorted_results['iBAQ'].max())
         sorted_results['lognormIBAQ'] = np.log(sorted_results['normIBAQ'])
         return sorted_results
 
@@ -66,12 +66,12 @@ class IbaqExtraction:
         cleaned_list_of_proteins = self.split_up_protein_groups(list_of_proteins)
         return cleaned_list_of_proteins
 
-    def get_rel_higher_than(self, fraction):
+    def get_perc_higher_than(self, percentage):
         """returns a list of proteins of at least 'percentage' intensity of the maximum iBAQ value"""
-        if fraction == 0:   # to include '-inf' log values
+        if percentage == 0:   # to include all values
             list_of_proteins = self.results.index.tolist()
         else:
-            top_frac = self.results[self.results['normIBAQ'] >= fraction]
+            top_frac = self.results[self.results['normIBAQ'] >= (percentage / 100.)]
             list_of_proteins = top_frac.index.tolist()
         # split single elements containing multiple proteins into multiple elements
         cleaned_list_of_proteins = self.split_up_protein_groups(list_of_proteins)
@@ -180,7 +180,7 @@ class FastaHandler:
         no_found_protein = 0
         path, filename_only = os.path.split(filename)
         filename_wo_ext, ext = os.path.splitext(filename_only)
-        filename_not_found = os.path.join(path, filename_wo_ext + "_not_found_in_reference" + ext)
+        filename_not_found = os.path.join(path, filename_wo_ext + "-not_found_in_reference" + ext)
         with open(filename_not_found, 'w+') as f_not_found:
             f_not_found.write(r"# all the proteins not found in the reference fasta are listed here."+'\n')
             with open(filename, 'w+') as f:

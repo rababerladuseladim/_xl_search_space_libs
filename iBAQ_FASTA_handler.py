@@ -8,11 +8,16 @@ import os
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
+version = "1.0.0"
+logging.info("version: {}".format(version))
+
 
 class IbaqExtraction:
-    """takes a MaxQuant results file and
+    """
+    takes a MaxQuant results file and
     returns a sorted list of tuples,
-    each tuple containing the protein identifier and the respective iBAQ value of the protein"""
+    each tuple containing the protein identifier and the respective iBAQ value of the protein
+    """
     def __init__(self, filename, keep_contaminants=False, index="Protein IDs"):
         self.filename = filename
         self.keep_contaminants = keep_contaminants
@@ -27,7 +32,7 @@ class IbaqExtraction:
         raw_file.index = raw_file[index]
         raw_file[['Potential contaminant', "Reverse"]] = raw_file[['Potential contaminant', "Reverse"]].astype(str)
 
-        # filter out contaminants
+        # drop contaminants
         if not self.keep_contaminants:
             raw_file = raw_file[raw_file["Potential contaminant"] != "+"]
 
@@ -45,6 +50,13 @@ class IbaqExtraction:
 
     @staticmethod
     def split_up_protein_groups(list_to_clean):
+        """
+        splits up list elements that contain multiple proteinIDs.
+        Split strings: [";"]
+
+        :param list_to_clean:
+        :return: list of seperated protein IDs
+        """
         cleaned_list_of_proteins = []
         for element in list_to_clean:
             subelements = element.split(';')

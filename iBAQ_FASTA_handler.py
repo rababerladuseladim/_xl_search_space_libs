@@ -180,11 +180,11 @@ class FastaHandler:
                 elif protein_seq_regex_hit and protein_not_in_mydict:
                     mydict[dict_key] += line.strip()
         if not list_of_non_unique_ids:
-            logging.debug("no duplicates in fasta file '{}'".format(self.filename))
+            logger.debug("no duplicates in fasta file '{}'".format(self.filename))
         else:
             msg = "Duplicates in fasta file '{}': \n{}".format(self.filename, list_of_non_unique_ids)
             print msg
-            logging.warning(msg)
+            logger.warning(msg)
         return mydict
 
     def build_fasta(self, protein_id_list, filename, max_number=None):
@@ -211,8 +211,8 @@ class FastaHandler:
                         # print msg
 
         if bool_unfound_protein:
-            logging.warning("some of the specified proteins were not found in {0}, please check {1}"
-                            .format(self.filename, filename_not_found))
+            logger.warning("some of the specified proteins were not found in {0}, please check {1}"
+                           .format(self.filename, filename_not_found))
 
 # # # test cases
 if __name__ == "__main__":

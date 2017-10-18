@@ -144,7 +144,7 @@ class XiWrapper:
 
         # call xi
         starttime = time.time()
-        logging.info("XiSearch cmd: {}".format(" ".join(map(str, xi_cmd))))
+        logger.info("XiSearch cmd: {}".format(" ".join(map(str, xi_cmd))))
         process = subprocess.Popen(xi_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         # real time output of Xi messages
         while True:
@@ -154,12 +154,12 @@ class XiWrapper:
                 break
             elif output:
                 # print output.strip()
-                logging.debug("XiSearch: " + output.strip())
+                logger.debug("XiSearch: " + output.strip())
                 if "java.lang.OutOfMemoryError" in output:
                     process.kill()
                     raise XiSearchOutOfMemoryException(returncode=1, cmd=xi_cmd, out_file=output_file, output=output)
         if exit_code != 0:  # if process exit code is non zero
             raise XiSearchException(exit_code, xi_cmd, output_file, 'XiSearch exited with error message!')
-        logging.info("XiSearch execution took {} for cmd: {}"
-                     .format(XiWrapper.calculate_elapsed_time(starttime), xi_cmd))
+        logger.info("XiSearch execution took {} for cmd: {}"
+                    .format(XiWrapper.calculate_elapsed_time(starttime), xi_cmd))
         return output_file

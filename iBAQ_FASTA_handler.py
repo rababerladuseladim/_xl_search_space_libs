@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 version = "1.0.0"
-logging.info("version: {}".format(version))
+logger.info("version: {}".format(version))
 
 
 class IbaqExtraction:

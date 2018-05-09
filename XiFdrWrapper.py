@@ -49,8 +49,10 @@ class XiFdrWrapper:
         return cmd
 
     @staticmethod
-    def xifdr_execution(xifdr_input_csv, xifdr_output_dir, pepfdr="5", memory="1G", reportfactor="10000",
-                        additional_xifdr_arguments=list()):
+    def xifdr_execution(
+            xifdr_input_csv, xifdr_output_dir, pepfdr="5", memory="1G", reportfactor="10000",
+            additional_xifdr_arguments=list(), xifdr_filename="xiFDRDB-1.1.25.55-jar-with-dependencies.jar"
+    ):
         """
         takes XiSearch output and gives back fdr csv
         :param xifdr_input_csv:
@@ -66,7 +68,7 @@ class XiFdrWrapper:
             os.makedirs(xifdr_output_dir)
         starttime = time.time()
         xifdr_cmd = XiFdrWrapper.build_xifdr_arguments(xifdr_input_csv, xifdr_output_dir, pepfdr, memory, reportfactor,
-                                                       additional_xifdr_arguments)
+                                                       additional_xifdr_arguments, xifdr_filename=xifdr_filename)
         logger.info("xiFDR arguments: {}".format(" ".join(map(str, xifdr_cmd))))
         # # # # #
         process = subprocess.Popen(xifdr_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

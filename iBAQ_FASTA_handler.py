@@ -153,6 +153,84 @@ class IbaqExtraction:
 # print ibaq_list.get_top_quant(0.5)
 
 
+class mq_Evidence:
+    def __init__(self, filename):
+        self.filename = filename
+        self.df_evidence = pd.read_table(self.filename)
+
+    def clean_non_targets(self, df):
+        """
+        helper function to drop contaminants and reversed peptides
+        :param df:
+        :return:
+        """
+        # drop contaminants
+        df = df[df["Potential contaminant"] != "+"]
+        # drop reverse
+        df = df[df["Reverse"] != "+"]
+        return df
+
+    def filter_raw_file(self, str_raw_file, df):
+        """
+        keep only rows from specified raw file
+        """
+        assert df["Raw file"].str.contains(str_raw_file).any(), \
+            "The raw file '{}' can not be found in input column 'Raw file'.".format(str_raw_file)
+        df = df[df["Raw file"] == str_raw_file]
+        return df
+
+    def extract_intensities(self, raw_file="", intensity="global"):
+        """
+        sums up intensities of all proteins
+        contaminants and reversed peptides are filtered out
+        :param raw_file: optional, keep only intensities of single raw file
+        :param intensity: optional, keep intensity of specific label
+        :return: DataFrame, "Proteins" as index, specified intensity as column
+        """
+        intensity_dict = {
+            "global": "Intensity",
+            "l": 'Intensity L',
+            "m": 'Intensity M',
+            "h": 'Intensity H'
+        }
+        assert intensity in intensity_dict
+
+        df = self.clean_non_targets(self.df_evidence)
+
+        # keep only data for one raw file
+        if raw_file:
+            df = self.filter_raw_file(str_raw_file=raw_file, df=df)
+
+        # sum up intensities for each protein
+        col_intensity = intensity_dict[intensity]
+        df_intensity_self_calc = df.groupby('Proteins')[col_intensity].sum()
+        # keep only nonzero values
+        df_intensity_self_calc = df_intensity_self_calc.iloc[df_intensity_self_calc.nonzero()]
+        # series to df
+        df_intensity_self_calc = pd.DataFrame(df_intensity_self_calc)
+        return df_intensity_self_calc
+
+    def extract_psm_count(self, raw_file=""):
+        """
+        returns sum of column "MS/MS count" for each protein
+        contaminants and reversed peptides are filtered out
+        optionally filter for one single raw_file
+        """
+        df = self.clean_non_targets(self.df_evidence)
+
+        # keep only data for one raw file
+        if raw_file:
+            df = self.filter_raw_file(str_raw_file=raw_file, df=df)
+
+        # sum up intensities for each protein
+        df = df.groupby('Proteins')["MS/MS count"].sum()
+        # keep only nonzero values
+        df = df.iloc[df.nonzero()]
+        # series to df
+        df = pd.DataFrame(df)
+        return df
+
+
 class FastaHandler:
     def __init__(self, fasta_filename, re_id_pattern=r'^>.*\|(.*)\|.*'):
         self.filename = fasta_filename
@@ -160,37 +238,42 @@ class FastaHandler:
 
     def read_fasta(self, re_id_pattern):
         """read self.filename fasta file into a dict with protein id as key and its sequence as value"""
-        mydict = {}
+        dct_fasta = {}
         dict_key = ""
         list_of_non_unique_ids = []
         protein_id_regex = re.compile(re_id_pattern)
         protein_seq_regex = re.compile(r'^[A-Za-z]\B')
+        protein_not_in_mydict = False
         with open(self.filename) as db:
             for line in db.readlines():
                 protein_id_regex_hit = protein_id_regex.match(line)
                 protein_seq_regex_hit = protein_seq_regex.match(line)
                 if protein_id_regex_hit:
                     dict_key = protein_id_regex_hit.group(1)
-                    if dict_key not in mydict.keys():
-                        mydict[dict_key] = ''
+                    if dict_key not in dct_fasta.keys():
+                        dct_fasta[dict_key] = ''
                         protein_not_in_mydict = True
                     else:
                         list_of_non_unique_ids.append(dict_key)
                         protein_not_in_mydict = False
                 elif protein_seq_regex_hit and protein_not_in_mydict:
-                    mydict[dict_key] += line.strip()
-        if not list_of_non_unique_ids:
+                    dct_fasta[dict_key] += line.strip()
+        if len(dct_fasta.keys()) == 0:
+            raise ValueError("No proteins could be extracted from fasta with the given regular expression.")
+        if len(list_of_non_unique_ids) == 0:
             logger.debug("no duplicates in fasta file '{}'".format(self.filename))
         else:
             msg = "Duplicates in fasta file '{}': \n{}".format(self.filename, list_of_non_unique_ids)
             print msg
             logger.warning(msg)
-        return mydict
+        return dct_fasta
 
     def build_fasta(self, protein_id_list, filename, max_number=None):
         bool_unfound_protein = False
         no_found_protein = 0
         path, filename_only = os.path.split(filename)
+        if not os.path.exists(path):
+            os.makedirs(path)
         filename_wo_ext, ext = os.path.splitext(filename_only)
         filename_not_found = os.path.join(path, filename_wo_ext + "-not_found_in_reference" + ext)
         with open(filename_not_found, 'w+') as f_not_found:
@@ -213,6 +296,7 @@ class FastaHandler:
         if bool_unfound_protein:
             logger.warning("some of the specified proteins were not found in {0}, please check {1}"
                            .format(self.filename, filename_not_found))
+
 
 # # # test cases
 if __name__ == "__main__":

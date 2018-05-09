@@ -29,7 +29,18 @@ class XiSearchOutOfMemoryException(XiSearchException):
 
     def __str__(self):
         return "Command '{:s}' produced java Memory Exception '{}'. You might want to remove the result stub."\
-            .format(self.cmd, self.output)
+            .format(" ".join(self.cmd), self.output)
+
+
+class XiSearchDaemoniseFailureException(XiSearchException):
+    def __init__(self, returncode, cmd, out_file, output):
+        XiSearchException.__init__(self, returncode, cmd, out_file, output)
+        pass
+
+    def __str__(self):
+        return "Command '{:s}' failed while writing result with following error: '{}'." + \
+               "The result file should be mostly complete though."\
+            .format(" ".join(self.cmd), self.output)
 
 
 class XiWrapper:
@@ -158,6 +169,12 @@ class XiWrapper:
                 if "java.lang.OutOfMemoryError" in output:
                     process.kill()
                     raise XiSearchOutOfMemoryException(returncode=1, cmd=xi_cmd, out_file=output_file, output=output)
+                elif "could not daemonise BufferedResultWriter_batchforward" in output:
+                    process.kill()
+                    raise XiSearchDaemoniseFailureException(
+                        returncode=1, cmd=xi_cmd, out_file=output_file, output=output
+                    )
+
         if exit_code != 0:  # if process exit code is non zero
             raise XiSearchException(exit_code, xi_cmd, output_file, 'XiSearch exited with error message!')
         logger.info("XiSearch execution took {} for cmd: {}"

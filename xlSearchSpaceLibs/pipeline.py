@@ -15,7 +15,7 @@ import os
 import time
 
 import XiWrapper
-from lib.XiFdrWrapper import XiFdrWrapper
+from XiFdrWrapper import XiFdrWrapper
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

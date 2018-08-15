@@ -264,7 +264,7 @@ class FastaHandler:
             logger.debug("no duplicates in fasta file '{}'".format(self.filename))
         else:
             msg = "Duplicates in fasta file '{}': \n{}".format(self.filename, list_of_non_unique_ids)
-            print msg
+            print(msg)
             logger.warning(msg)
         return dct_fasta
 

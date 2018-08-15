@@ -1,9 +1,9 @@
 from setuptools import setup
 
-setup(name='xl-search-space-libs',
+setup(name='xlSearchSpaceLibs',
       version='0.1',
       description='Scripts that are required by several pipelines in the search space optimization.',
-      url='http://github.com/rababerladuseladim/xl-search-space-libs',
-      author='Henning',
-      packages=['xl-search-space-libs'],
+      url='http://github.com/rababerladuseladim/xlSearchSpaceLibs',
+      author='rababerladuseladim',
+      packages=['xlSearchSpaceLibs'],
       zip_safe=False)

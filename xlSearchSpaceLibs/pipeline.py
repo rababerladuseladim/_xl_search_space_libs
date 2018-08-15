@@ -166,7 +166,9 @@ def execute_pipeline(
         xi_memory='1G', additional_xi_parameters=list(), xi_path="XiSearch.jar",
         # optional xifdr settings
         pepfdr="5", xifdr_memory="1G", reportfactor="10000",
-        additional_xifdr_arguments=list()):
+        additional_xifdr_arguments=list(),
+        xifdr_filename="xiFDRDB.jar"
+):
     """
     This pipeline executes:
     xiSeqrch
@@ -208,7 +210,8 @@ def execute_pipeline(
         pepfdr=pepfdr,
         memory=xifdr_memory,
         reportfactor=reportfactor,
-        additional_xifdr_arguments=additional_xifdr_arguments
+        additional_xifdr_arguments=additional_xifdr_arguments,
+        xifdr_filename=xifdr_filename
     )
     # logger.info("xifdr execution for '{}' took {}"
     #             .format(list_of_dirs[1], calculate_elapsed_time(starttime)))

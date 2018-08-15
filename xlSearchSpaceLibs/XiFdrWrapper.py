@@ -63,8 +63,11 @@ class XiFdrWrapper:
         """
         if not os.path.isfile(xifdr_filename):
             raise IOError("Could not find xifdr executable: '{}'".format(os.path.abspath(xifdr_filename)))
-        if not os.path.isfile(xifdr_input_csv):
-            raise IOError("Could not find xifdr input file: '{}'".format(os.path.abspath(xifdr_input_csv)))
+        if isinstance(xifdr_input_csv, (str, unicode)):
+            xifdr_input_csv = [xifdr_input_csv]
+        for f in xifdr_input_csv:
+            if not os.path.isfile(f):
+                raise IOError("Could not find xifdr input file: '{}'".format(os.path.abspath(f)))
         list_of_results = []
         if isinstance(xifdr_input_csv, str):
             xifdr_input_csv = [xifdr_input_csv]

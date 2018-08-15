@@ -137,8 +137,8 @@ class XiWrapper:
         list_of_all_files.append(xi_path)
         for f in list_of_all_files:
             if not os.path.exists(f):
-                raise IOError("Could not find specified file: '{}' Is the path correct?"
-                              .format(f))
+                raise IOError("Could not find Xi executable. Is the path correct? '{}'"
+                              .format(os.path.abspath(f)))
 
         if not os.path.exists(os.path.split(output_file)[0]):
             os.makedirs(os.path.split(output_file)[0])

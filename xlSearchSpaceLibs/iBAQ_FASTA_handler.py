@@ -261,11 +261,11 @@ class FastaHandler:
         if len(dct_fasta.keys()) == 0:
             raise ValueError("No proteins could be extracted from fasta with the given regular expression.")
         if len(list_of_non_unique_ids) == 0:
-            logger.debug("no duplicates in fasta file '{}'".format(self.filename))
+            logging.debug("no duplicates in fasta file '{}'".format(self.filename))
         else:
             msg = "Duplicates in fasta file '{}': \n{}".format(self.filename, list_of_non_unique_ids)
             print(msg)
-            logger.warning(msg)
+            logging.warning(msg)
         return dct_fasta
 
     def build_fasta(self, protein_id_list, filename, max_number=None):
@@ -294,7 +294,7 @@ class FastaHandler:
                         # print msg
 
         if bool_unfound_protein:
-            logger.warning("some of the specified proteins were not found in {0}, please check {1}"
+            logging.warning("some of the specified proteins were not found in {0}, please check {1}"
                            .format(self.filename, filename_not_found))
 
 

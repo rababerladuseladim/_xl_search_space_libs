@@ -3,7 +3,7 @@ Evaluate results of ribosome fraction 14.
 To do so, use pipeline for xifdr analysis.
 """
 
-from lib.XiFdrWrapper import XiFdrWrapper
+from XiFdrWrapper import XiFdrWrapper
 import os
 import logging
 import sys
